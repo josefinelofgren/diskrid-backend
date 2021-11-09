@@ -62,15 +62,12 @@ router.post('/sign-up', function(req, res, next) {
     // if email already exist
     } if (result){
       console.log("Email already exist")
-      res.send(true);
+      res.send(false);
   
     // add new user to db 
     } else {
       req.app.locals.db.collection('users').insertOne(newUser)
-      .then(result => {
-        res.send(result.ops)
-
-      })
+      res.send(true)
     }
   })
 })
