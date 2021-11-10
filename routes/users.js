@@ -23,7 +23,14 @@ router.post('/log-in', function(req, res, next){
 
       // check if email and password is correct
       if(result.email == req.body.email && originalPassword == req.body.password){
-        res.send(result)
+        let currentUser = { 
+          email: result.email,
+          subscriptionStatus: result.subscriptionStatus,
+          subscription: result.subscription
+         }
+        
+         res.send(currentUser)
+
       } else {
         res.send(false)
       }
@@ -48,11 +55,11 @@ router.post('/sign-up', function(req, res, next) {
   let newUser = {
     "email": req.body.email, 
     "password" : cryptoPassword,
-    "subscriptionStatus" : req.body.subscriptionStatus
+    "subscriptionStatus" : req.body.subscriptionStatus,
+    "subscription" : req.body.subscription
   }
 
   console.log(newUser);
-  console.log(req.body.email);
 
   // check if email exists in db 
   req.app.locals.db.collection('users').findOne({"email" : req.body.email}, function (err, result){
@@ -67,7 +74,14 @@ router.post('/sign-up', function(req, res, next) {
     // add new user to db 
     } else {
       req.app.locals.db.collection('users').insertOne(newUser)
-      res.send(true)
+      
+      let currentUser = { 
+        email: req.body.email, 
+        subscriptionStatus: req.body.subscriptionStatus,
+        subscription: req.body.subscription
+       }
+      
+       res.send(currentUser)
     }
   })
 })
