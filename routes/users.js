@@ -86,6 +86,26 @@ router.post('/sign-up', function(req, res, next) {
   })
 })
 
+// UPDATE CURRENT USERS SUBSCRIPTION
+router.post('/update-subscription', function(req, res, next) {
+
+  console.log(req.body.email);
+  console.log(req.body.subscriptionStatus);
+  console.log(req.body.subscription);
+  
+  // find email and update subscription
+  req.app.locals.db.collection('users').findOneAndUpdate({"email" : req.body.email}, { $set: {"subscription" : req.body.subscription }})
+  req.app.locals.db.collection('users').findOneAndUpdate({"email" : req.body.email}, { $set: {"subscriptionStatus" : req.body.subscriptionStatus }})
+
+  let currentUser = { 
+    email: req.body.email, 
+    subscriptionStatus: req.body.subscriptionStatus,
+    subscription: req.body.subscription
+   }
+  
+   res.send(currentUser)
+});
+
 
 
 
