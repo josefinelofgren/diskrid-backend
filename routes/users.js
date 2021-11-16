@@ -6,7 +6,9 @@ const { runInNewContext } = require('vm');
 const { ObjectId } = require('mongodb');
 const cryptoJS = require('crypto-js');
 const generator = require('generate-password');
+const nodemailer = require('nodemailer');
 
+// const transporter = nodemailer.createTransport()
 
 // LOGIN FOR REGISTRATED USERS 
 router.post('/log-in', function(req, res, next){
@@ -95,29 +97,30 @@ router.post('/submit', (req, res) => {
     } else if (result) {
       res.json("account exists");
     } else {
-      const newPassword = generator.generate({
-        length: 10,
-        numbers: true
-      });
+      // const newPassword = generator.generate({
+      //   length: 10,
+      //   numbers: true
+      // });
 
-      const cryptoPassword = cryptoJS.AES.encrypt(newPassword, 'admin').toString();
-      const date = new Date();
+      const cryptoPassword = cryptoJS.AES.encrypt(req.body.password, 'admin').toString();
+      const newDate = new Date();
 
       const newUser = {
         email: req.body.email,
         password: cryptoPassword,
         subscriptionStatus: true,
         subscription: {
-          creationDate: date,
+          creationDate: newDate,
           color: req.body.color,
           quantity: req.body.quantity,
-          delivery: req.body.delivery,
+          delivery: req.body.delivery
         }
       }
 
       req.app.locals.db.collection('users').insertOne(newUser)
       .then(() => {
-        newUser.password = newPassword;
+
+        newUser.password = req.body.password;
         res.json(newUser);
       })
     }
@@ -125,6 +128,7 @@ router.post('/submit', (req, res) => {
 
 })
 
+//DEVELOPMENT/DEBUGGING ONLY!
 router.get('/show-db', (req, res) => {
   req.app.locals.db.collection('users').find().toArray()
   .then(results => {
@@ -132,6 +136,12 @@ router.get('/show-db', (req, res) => {
   })
 })
 
+router.post('/delete', (req, res) => {
+  req.app.locals.db.collection('users').deleteOne({email: req.body.email})
+  .then(result => {
+    res.send(result)
+  })
+})
 
 
 module.exports = router;
