@@ -5,6 +5,7 @@ const cors = require('cors');
 const { runInNewContext } = require('vm');
 const { ObjectId } = require('mongodb');
 const cryptoJS = require('crypto-js');
+const generator = require('generate-password');
 
 
 // LOGIN FOR REGISTRATED USERS 
@@ -94,8 +95,7 @@ router.post('/update-subscription', function(req, res, next) {
   console.log(req.body.subscription);
   
   // find email and update subscription
-  req.app.locals.db.collection('users').findOneAndUpdate({"email" : req.body.email}, { $set: {"subscription" : req.body.subscription }})
-  req.app.locals.db.collection('users').findOneAndUpdate({"email" : req.body.email}, { $set: {"subscriptionStatus" : req.body.subscriptionStatus }})
+  req.app.locals.db.collection('users').findOneAndUpdate({"email" : req.body.email}, { $set: {"subscription" : req.body.subscription, "subscriptionStatus" : req.body.subscriptionStatus}})
 
   let currentUser = { 
     email: req.body.email, 
@@ -105,10 +105,54 @@ router.post('/update-subscription', function(req, res, next) {
   
    res.send(currentUser)
 });
+router.post('/submit', (req, res) => {
+  console.log(req.body);
+  req.app.locals.db.collection('users').findOne({"email" : req.body.email}, (err, result) => {
+    if(err) {
+      console.log(err);
+    } else if (result) {
+      res.json("account exists");
+    } else {
+      const newPassword = generator.generate({
+        length: 10,
+        numbers: true
+      });
 
+      const cryptoPassword = cryptoJS.AES.encrypt(newPassword, 'admin').toString();
+      const date = new Date();
 
+      const newUser = {
+        email: req.body.email,
+        password: cryptoPassword,
+        subscriptionStatus: true,
+        subscription: {
+          creationDate: date,
+          color: req.body.color,
+          quantity: req.body.quantity,
+          delivery: req.body.delivery,
+        }
+      }
 
+      req.app.locals.db.collection('users').insertOne(newUser)
+      .then(() => {
+        newUser.password = newPassword;
+        res.json(newUser);
+      })
+    }
+  })
+
+})
+
+router.get('/show-db', (req, res) => {
+  req.app.locals.db.collection('users').find().toArray()
+  .then(results => {
+    res.json(results);
+  })
+})
 
 
 
 module.exports = router;
+
+
+
