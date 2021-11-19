@@ -1,4 +1,5 @@
-Assignment: "Diskrid"
+# Assignment: "Diskrid"
+
 This app uses mongoDB Atlas as a database. The application is deployed at Heroku. You will find the front end application [here](https://github.com/josefinelofgren/diskrid).
 
 ## Install project 
