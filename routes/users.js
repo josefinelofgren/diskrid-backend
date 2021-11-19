@@ -5,8 +5,7 @@ const cors = require('cors');
 const { runInNewContext } = require('vm');
 const { ObjectId } = require('mongodb');
 const cryptoJS = require('crypto-js');
-const generator = require('generate-password');
-const nodemailer = require('nodemailer');
+
 
 // const transporter = nodemailer.createTransport()
 
