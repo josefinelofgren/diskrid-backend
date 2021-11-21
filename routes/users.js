@@ -151,10 +151,12 @@ router.post('/submit', (req, res) => {
 
 })
 router.post('/skip', (req, res) => {
-  req.app.locals.db.collection('users').findOneAndUpdate({"email": req.body.email}, {$set: {"subscription.creationDate": req.body.creationDate}})
+  console.log(req.body)
+  req.app.locals.db.collection('users').findOneAndUpdate({"email": req.body.email}, {$set: {"subscription": req.body.subscription}})
   .then(response => {
+    console.log("creationDate: ", req.body.subscription.creationDate)
     console.log(response.value.subscription);
-    res.json(response.value.subscription.creationDate);
+    res.json(req.body);
   })
 })
 
