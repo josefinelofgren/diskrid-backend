@@ -1,41 +1,47 @@
 var express = require('express');
 var router = express.Router();
-const fs = require('fs');
 const cors = require('cors');
-const { runInNewContext } = require('vm');
-const { ObjectId } = require('mongodb');
 const cryptoJS = require('crypto-js');
 
 
 // const transporter = nodemailer.createTransport()
 
 // LOGIN FOR REGISTRATED USERS 
-router.post('/log-in', function(req, res, next){
+router.post('/log-in/:pageload?', function(req, res, next){
   
   // find email adress
+  console.log(req.body)
   req.app.locals.db.collection('users').findOne({"email" : req.body.email}, function (err, result){
     if (err){
       console.log("ERROR");
     
     } if (result){
-      
-      // decrypt password from db
-      let originalPassword = cryptoJS.AES.decrypt(result.password, 'admin').toString(cryptoJS.enc.Utf8);
-      console.log(originalPassword);
-
-      // check if email and password is correct
-      if(result.email == req.body.email && originalPassword == req.body.password){
+      if(!req.params.pageload) {
+        let originalPassword = cryptoJS.AES.decrypt(result.password, 'admin').toString(cryptoJS.enc.Utf8);
+        console.log(originalPassword);
+  
+        // check if email and password is correct
+        if(result.email == req.body.email && originalPassword == req.body.password){
+          let currentUser = { 
+            email: result.email,
+            subscriptionStatus: result.subscriptionStatus,
+            subscription: result.subscription
+           }
+          
+           res.send(currentUser)
+  
+        } else {
+          res.send(false)
+        }
+      } else {
         let currentUser = { 
           email: result.email,
           subscriptionStatus: result.subscriptionStatus,
           subscription: result.subscription
          }
-        
-         res.send(currentUser)
-
-      } else {
-        res.send(false)
+         res.json(currentUser)
       }
+      // decrypt password from db
     
     // if email is not found 
     } else {
@@ -144,6 +150,15 @@ router.post('/submit', (req, res) => {
     }
   })
 
+})
+router.post('/skip', (req, res) => {
+  console.log(req.body)
+  req.app.locals.db.collection('users').findOneAndUpdate({"email": req.body.email}, {$set: {"subscription": req.body.subscription}})
+  .then(response => {
+    console.log("creationDate: ", req.body.subscription.creationDate)
+    console.log(response.value.subscription);
+    res.json(req.body);
+  })
 })
 
 //DEVELOPMENT/DEBUGGING ONLY!
