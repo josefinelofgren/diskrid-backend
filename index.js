@@ -29,7 +29,11 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}))
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
+app.get('/', (req, res) => {
+  console.log("Server responding")
+  res.send("Hello from Heroku");
+})
+// app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 
