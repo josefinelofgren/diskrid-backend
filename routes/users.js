@@ -8,6 +8,8 @@ const cryptoJS = require('crypto-js');
 const generator = require('generate-password');
 const nodemailer = require('nodemailer');
 
+router.use(cors());
+
 // const transporter = nodemailer.createTransport()
 
 // LOGIN FOR REGISTRATED USERS 
@@ -107,6 +109,7 @@ router.post('/update-subscription', function(req, res, next) {
   
    res.send(currentUser)
 });
+
 router.post('/submit', (req, res) => {
   console.log(req.body);
   req.app.locals.db.collection('users').findOne({"email" : req.body.email}, (err, result) => {
