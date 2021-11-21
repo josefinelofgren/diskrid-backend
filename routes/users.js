@@ -7,8 +7,6 @@ const { ObjectId } = require('mongodb');
 const cryptoJS = require('crypto-js');
 
 
-router.use(cors());
-
 // const transporter = nodemailer.createTransport()
 
 // LOGIN FOR REGISTRATED USERS 
